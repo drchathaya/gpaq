@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>แบบสอบถามกิจกรรมทางกาย (GPAQ)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Sarabun', sans-serif;
+      font-size: 17px;
+      background: #f4f6f9;
+      color: #1a1a1a;
+      line-height: 1.7;
+    }
+
+    header {
+      background: #1a3a6b;
+      color: #fff;
+      padding: 24px 20px 20px;
+      text-align: center;
+    }
+    header h1 { font-size: 22px; font-weight: 700; }
+    header p  { font-size: 14px; opacity: 0.8; margin-top: 6px; }
+
+    .progress-bar-wrap {
+      background: #d0d8e4;
+      height: 6px;
+    }
+    .progress-bar {
+      height: 6px;
+      background: #2e7d32;
+      width: 0%;
+      transition: width 0.4s ease;
+    }
+
+    main {
+      max-width: 720px;
+      margin: 28px auto 60px;
+      padding: 0 16px;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      margin-bottom: 24px;
+      overflow: hidden;
+    }
+
+    .card-header {
+      background: #1a3a6b;
+      color: #fff;
+      padding: 14px 20px;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+    }
+    .card-header.green  { background: #2e7d32; }
+    .card-header.teal   { background: #00695c; }
+    .card-header.amber  { background: #e65100; }
+    .card-header.purple { background: #4a148c; }
+
+    .card-body { padding: 20px; }
+
+    .question-block {
+      margin-bottom: 22px;
+      transition: opacity 0.3s, max-height 0.4s;
+    }
+    .question-block.hidden {
+      display: none;
+    }
+
+    .question-label {
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: #1a1a1a;
+    }
+    .question-label span.q-num {
+      display: inline-block;
+      background: #1a3a6b;
+      color: #fff;
+      border-radius: 50%;
+      width: 26px;
+      height: 26px;
+      font-size: 13px;
+      font-weight: 700;
+      text-align: center;
+      line-height: 26px;
+      margin-right: 8px;
+      flex-shrink: 0;
+    }
+
+    .hint {
+      font-size: 13.5px;
+      color: #555;
+      margin-bottom: 10px;
+      padding: 10px 14px;
+      background: #f0f4ff;
+      border-left: 3px solid #1a3a6b;
+      border-radius: 0 6px 6px 0;
+    }
+
+    /* Radio / checkbox */
+    .radio-group { display: flex; flex-direction: column; gap: 10px; }
+    .radio-option {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border: 1.5px solid #ddd;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .radio-option:hover { border-color: #1a3a6b; background: #f0f4ff; }
+    .radio-option input[type="radio"] { accent-color: #1a3a6b; width: 18px; height: 18px; flex-shrink: 0; }
+    .radio-option.selected { border-color: #1a3a6b; background: #e8eef8; }
+
+    /* Number input */
+    .number-input-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    input[type="number"] {
+      width: 90px;
+      padding: 10px 12px;
+      border: 1.5px solid #ccc;
+      border-radius: 8px;
+      font-family: 'Sarabun', sans-serif;
+      font-size: 16px;
+      text-align: center;
+    }
+    input[type="number"]:focus { outline: none; border-color: #1a3a6b; }
+    .unit-label { color: #555; font-size: 15px; }
+
+    /* Time input */
+    .time-input-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .time-input-row input[type="number"] { width: 75px; }
+    .time-sep { font-size: 20px; font-weight: 700; color: #555; }
+
+    /* Text input (age) */
+    input[type="text"] {
+      width: 120px;
+      padding: 10px 12px;
+      border: 1.5px solid #ccc;
+      border-radius: 8px;
+      font-family: 'Sarabun', sans-serif;
+      font-size: 16px;
+    }
+    input[type="text"]:focus { outline: none; border-color: #1a3a6b; }
+
+    /* Time picker */
+    input[type="time"] {
+      padding: 10px 12px;
+      border: 1.5px solid #ccc;
+      border-radius: 8px;
+      font-family: 'Sarabun', sans-serif;
+      font-size: 16px;
+    }
+    input[type="time"]:focus { outline: none; border-color: #1a3a6b; }
+
+    /* Submit */
+    .submit-area { text-align: center; margin-top: 10px; }
+    button[type="submit"] {
+      background: #1a3a6b;
+      color: #fff;
+      border: none;
+      padding: 14px 40px;
+      border-radius: 8px;
+      font-family: 'Sarabun', sans-serif;
+      font-size: 17px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    button[type="submit"]:hover { background: #122d57; }
+
+    /* Skip notice */
+    .skip-notice {
+      font-size: 13px;
+      color: #888;
+      font-style: italic;
+      margin-top: 4px;
+    }
+
+    /* Section instruction */
+    .section-note {
+      font-size: 14px;
+      color: #333;
+      background: #fafafa;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 14px 16px;
+      margin-bottom: 20px;
+      line-height: 1.8;
+    }
+
+    /* Thank you screen */
+    #thank-you {
+      display: none;
+      text-align: center;
+      padding: 60px 20px;
+    }
+    #thank-you .icon { font-size: 56px; }
+    #thank-you h2 { font-size: 24px; margin: 16px 0 8px; color: #2e7d32; }
+    #thank-you p { color: #555; }
+
+    @media (max-width: 480px) {
+      header h1 { font-size: 19px; }
+      .card-body { padding: 16px; }
+      button[type="submit"] { width: 100%; }
+    }
+
+    /* divider */
+    .divider { border: none; border-top: 1px solid #eee; margin: 18px 0; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>แบบสอบถามกิจกรรมทางกาย (GPAQ)</h1>
+  <p>Global Physical Activity Questionnaire — ฉบับภาษาไทย</p>
+</header>
+<div class="progress-bar-wrap">
+  <div class="progress-bar" id="progressBar"></div>
+</div>
+
+<main>
+  <form id="gpaqForm" novalidate>
+
+    <!-- ===== PERSONAL INFO ===== -->
+    <div class="card">
+      <div class="card-header">ข้อมูลส่วนบุคคล</div>
+      <div class="card-body">
+
+        <!-- Q1 เพศ -->
+        <div class="question-block">
+          <div class="question-label">
+            <span class="q-num">1</span> เพศ
+          </div>
+          <div class="radio-group">
+            <label class="radio-option">
+              <input type="radio" name="gender" value="ชาย" required />
+              ชาย
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="gender" value="หญิง" />
+              หญิง
+            </label>
+          </div>
+        </div>
+
+        <hr class="divider" />
+
+        <!-- Q2 อายุ -->
+        <div class="question-block">
+          <div class="question-label">
+            <span class="q-num">2</span> อายุ (ปีเต็ม)
+          </div>
+          <div class="number-input-row">
+            <input type="number" name="age" min="18" max="99" placeholder="เช่น 35" />
+            <span class="unit-label">ปี</span>
+          </div>
+        </div>
+
+        <hr class="divider" />
+
+        <!-- Q3 สถานภาพสมรส -->
+        <div class="question-block">
+          <div class="question-label">
+            <span class="q-num">3</span> สถานภาพสมรส
+          </div>
+          <div class="radio-group">
+            <label class="radio-option">
+              <input type="radio" name="marital" value="โสด" required />
+              โสด
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="marital" value="สมรส" />
+              สมรส
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="marital" value="หม้าย" />
+              หม้าย
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="marital" value="หย่า/แยก" />
+              หย่า / แยก
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="marital" value="ไม่ตอบ" />
+              ไม่ตอบ
+            </label>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ===== SECTION 6.1: WORK ===== -->
+    <div class="card">
+      <div class="card-header green">6.1 กิจกรรมทางกายในการทำงาน</div>
+      <div class="card-body">
+        <div class="section-note">
+          คำถามต่อไปนี้ถามเกี่ยวกับ<strong>เวลาที่ท่านใช้ทำกิจกรรมทางกายในการทำงาน</strong> โดยปกติในช่วง 1 สัปดาห์<br/>
+          ซึ่งรวมถึงการทำงานทุกประเภทที่ได้รับหรือไม่ได้รับค่าจ้าง งานบ้าน งานเกษตร การประมง และอื่นๆ
+        </div>
+
+        <!-- Q1: Heavy work? -->
+        <div class="question-block" id="block_w1">
+          <div class="question-label">
+            <span class="q-num">1</span>
+            งานที่ท่านทำเกี่ยวข้องกับ<strong>กิจกรรมทางกายระดับหนัก</strong> จนทำให้หายใจแรง หัวใจเต้นเร็วมาก รู้สึกเหนื่อยหอบ พูดไม่จบประโยค เช่น ยกของหนัก ขุดดิน งานก่อสร้าง เป็นเวลาต่อเนื่องอย่างน้อย 10 นาทีบ้างหรือไม่
+          </div>
+          <div class="radio-group">
+            <label class="radio-option">
+              <input type="radio" name="w1" value="1" required />
+              มี
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="w1" value="2" />
+              ไม่มี <span class="skip-notice">(ข้ามไปข้อ 4)</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Q2: Days/week heavy work -->
+        <div class="question-block hidden" id="block_w2">
+          <div class="question-label">
+            <span class="q-num">2</span>
+            โดยปกติใน 1 สัปดาห์ ท่านทำงานที่เป็นกิจกรรมทางกายระดับหนักนี้ กี่วัน
+          </div>
+          <div class="number-input-row">
+            <input type="number" name="w2_days" min="1" max="7" placeholder="0" />
+            <span class="unit-label">วัน / สัปดาห์</span>
+          </div>
+        </div>
+
+        <!-- Q3: Time/day heavy work -->
+        <div class="question-block hidden" id="block_w3">
+          <div class="question-label">
+            <span class="q-num">3</span>
+            โดยปกติใน 1 วัน ท่านใช้เวลานานเท่าไรสำหรับกิจกรรมระดับหนักนี้ (เฉพาะที่ทำต่อเนื่องอย่างน้อย 10 นาที)
+          </div>
+          <div class="time-input-row">
+            <input type="number" name="w3_hours" min="0" max="23" placeholder="0" />
+            <span class="unit-label">ชั่วโมง</span>
+            <input type="number" name="w3_mins" min="0" max="59" placeholder="0" />
+            <span class="unit-label">นาที</span>
+          </div>
+        </div>
+
+        <hr class="divider" />
+
+        <!-- Q4: Moderate work? -->
+        <div class="question-block" id="block_w4">
+          <div class="question-label">
+            <span class="q-num">4</span>
+            งานที่ท่านทำเกี่ยวข้องกับ<strong>กิจกรรมทางกายระดับปานกลาง</strong> ซึ่งทำให้หายใจเร็วขึ้นพอควรแต่ไม่ถึงกับหอบ เป็นเวลาต่อเนื่องอย่างน้อย 10 นาทีบ้างหรือไม่
+          </div>
+          <div class="radio-group">
+            <label class="radio-option">
+              <input type="radio" name="w4" value="1" />
+              มี
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="w4" value="2" />
+              ไม่มี <span class="skip-notice">(ข้ามไปข้อ 7)</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Q5: Days/week moderate work -->
+        <div class="question-block hidden" id="block_w5">
+          <div class="question-label">
+            <span class="q-num">5</span>
+            โดยปกติใน 1 สัปดาห์ ท่านทำงานที่เป็นกิจกรรมทางกายระดับปานกลางนี้ กี่วัน
+          </div>
+          <div class="number-input-row">
+            <input type="number" name="w5_days" min="1" max="7" placeholder="0" />
+            <span class="unit-label">วัน / สัปดาห์</span>
+          </div>
+        </div>
+
+        <!-- Q6: Time/day moderate work -->
+        <div class="question-block hidden" id="block_w6">
+          <div class="question-label">
+            <span class="q-num">6</span>
+            โดยปกติใน 1 วัน ท่านใช้เวลานานเท่าไรสำหรับกิจกรรมระดับปานกลางนี้ (เฉพาะที่ทำต่อเนื่องอย่างน้อย 10 นาที)
+          </div>
+          <div class="time-input-row">
+            <input type="number" name="w6_hours" min="0" max="23" placeholder="0" />
+            <span class="unit-label">ชั่วโมง</span>
+            <input type="number" name="w6_mins" min="0" max="59" placeholder="0" />
+            <span class="unit-label">นาที</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ===== SECTION 6.2: TRANSPORT ===== -->
+    <div class="card">
+      <div class="card-header teal">6.2 กิจกรรมทางกายในการเดินทาง</div>
+      <div class="card-body">
+        <div class="section-note">
+          คำถามในส่วนนี้<strong>ไม่รวม</strong>กิจกรรมทางกายที่เกี่ยวกับการทำงานตามที่กล่าวไปแล้ว<br/>
+          จะถามเฉพาะการเดินทางจากที่หนึ่งไปอีกที่หนึ่ง เช่น เดินทางไปทำงาน ไปตลาด ไปทำบุญ เป็นต้น
+        </div>
+
+        <!-- Q7: Walk/cycle for transport? -->
+        <div class="question-block" id="block_t7">
+          <div class="question-label">
+            <span class="q-num">7</span>
+            ท่านเดินหรือปั่นจักรยานจากที่หนึ่งไปยังอีกที่หนึ่ง เป็นเวลาต่อเนื่องอย่างน้อย 10 นาทีบ้างหรือไม่
+          </div>
+          <div class="radio-group">
+            <label class="radio-option">
+              <input type="radio" name="t7" value="1" />
+              มี
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="t7" value="2" />
+              ไม่มี <span class="skip-notice">(ข้ามไปข้อ 10)</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Q8: Days/week walk/cycle -->
+        <div class="question-block hidden" id="block_t8">
+          <div class="question-label">
+            <span class="q-num">8</span>
+            โดยปกติใน 1 สัปดาห์ ท่านเดินหรือปั่นจักรยานเพื่อการเดินทางกี่วัน
+          </div>
+          <div class="number-input-row">
+            <input type="number" name="t8_days" min="1" max="7" placeholder="0" />
+            <span class="unit-label">วัน / สัปดาห์</span>
+          </div>
+        </div>
+
+        <!-- Q9: Time/day walk/cycle -->
+        <div class="question-block hidden" id="block_t9">
+          <div class="question-label">
+            <span class="q-num">9</span>
+            โดยปกติใน 1 วัน ท่านใช้เวลานานเท่าไรในการเดินหรือปั่นจักรยานเพื่อการเดินทาง (เฉพาะที่ทำต่อเนื่องอย่างน้อย 10 นาที)
+          </div>
+          <div class="time-input-row">
+            <input type="number" name="t9_hours" min="0" max="23" placeholder="0" />
+            <span class="unit-label">ชั่วโมง</span>
+            <input type="number" name="t9_mins" min="0" max="59" placeholder="0" />
+            <span class="unit-label">นาที</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ===== SECTION 6.3: RECREATION ===== -->
+    <div class="card">
+      <div class="card-header amber">6.3 กิจกรรมทางกายเพื่อนันทนาการ / กิจกรรมยามว่าง</div>
+      <div class="card-body">
+        <div class="section-note">
+          คำถามในส่วนนี้<strong>ไม่รวม</strong>กิจกรรมการทำงานและการเดินทางตามที่กล่าวไปแล้ว<br/>
+          จะถามเฉพาะการเล่นกีฬา ออกกำลังกาย เต้นรำ หรือกิจกรรมยามว่างต่างๆ ที่ทำในเวลาว่างจากการทำงาน
+        </div>
+
+        <!-- Q10: Vigorous recreation? -->
+        <div class="question-block" id="block_r10">
+          <div class="question-label">
+            <span class="q-num">10</span>
+            ท่านเล่นกีฬา ออกกำลังกาย หรือทำกิจกรรมนันทนาการ<strong>ระดับหนัก</strong> จนทำให้หายใจแรง หัวใจเต้นเร็วมาก รู้สึกเหนื่อยหอบ เป็นเวลาต่อเนื่องอย่างน้อย 10 นาทีบ้างหรือไม่
+          </div>
+          <div class="radio-group">
+            <label class="radio-option">
+              <input type="radio" name="r10" value="1" />
+              มี
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="r10" value="2" />
+              ไม่มี <span class="skip-notice">(ข้ามไปข้อ 13)</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Q11: Days/week vigorous recreation -->
+        <div class="question-block hidden" id="block_r11">
+          <div class="question-label">
+            <span class="q-num">11</span>
+            โดยปกติใน 1 สัปดาห์ ท่านเล่นกีฬาหรือออกกำลังกายระดับหนักนี้กี่วัน
+          </div>
+          <div class="number-input-row">
+            <input type="number" name="r11_days" min="1" max="7" placeholder="0" />
+            <span class="unit-label">วัน / สัปดาห์</span>
+          </div>
+        </div>
+
+        <!-- Q12: Time/day vigorous recreation -->
+        <div class="question-block hidden" id="block_r12">
+          <div class="question-label">
+            <span class="q-num">12</span>
+            โดยปกติใน 1 วัน ท่านใช้เวลานานเท่าไรสำหรับกิจกรรมระดับหนักนี้ (เฉพาะที่ทำต่อเนื่องอย่างน้อย 10 นาที)
+          </div>
+          <div class="time-input-row">
+            <input type="number" name="r12_hours" min="0" max="23" placeholder="0" />
+            <span class="unit-label">ชั่วโมง</span>
+            <input type="number" name="r12_mins" min="0" max="59" placeholder="0" />
+            <span class="unit-label">นาที</span>
+          </div>
+        </div>
+
+        <hr class="divider" />
+
+        <!-- Q13: Moderate recreation? -->
+        <div class="question-block" id="block_r13">
+          <div class="question-label">
+            <span class="q-num">13</span>
+            ท่านเล่นกีฬา ออกกำลังกาย หรือทำกิจกรรมนันทนาการ<strong>ระดับปานกลาง</strong> ซึ่งทำให้หายใจเร็วขึ้นพอควรแต่ไม่ถึงกับหอบ เป็นเวลาต่อเนื่องอย่างน้อย 10 นาทีบ้างหรือไม่
+          </div>
+          <div class="radio-group">
+            <label class="radio-option">
+              <input type="radio" name="r13" value="1" />
+              มี
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="r13" value="2" />
+              ไม่มี <span class="skip-notice">(ข้ามไปข้อ 16)</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Q14: Days/week moderate recreation -->
+        <div class="question-block hidden" id="block_r14">
+          <div class="question-label">
+            <span class="q-num">14</span>
+            โดยปกติใน 1 สัปดาห์ ท่านเล่นกีฬาหรือออกกำลังกายระดับปานกลางนี้กี่วัน
+          </div>
+          <div class="number-input-row">
+            <input type="number" name="r14_days" min="1" max="7" placeholder="0" />
+            <span class="unit-label">วัน / สัปดาห์</span>
+          </div>
+        </div>
+
+        <!-- Q15: Time/day moderate recreation -->
+        <div class="question-block hidden" id="block_r15">
+          <div class="question-label">
+            <span class="q-num">15</span>
+            โดยปกติใน 1 วัน ท่านใช้เวลานานเท่าไรสำหรับกิจกรรมระดับปานกลางนี้ (เฉพาะที่ทำต่อเนื่องอย่างน้อย 10 นาที)
+          </div>
+          <div class="time-input-row">
+            <input type="number" name="r15_hours" min="0" max="23" placeholder="0" />
+            <span class="unit-label">ชั่วโมง</span>
+            <input type="number" name="r15_mins" min="0" max="59" placeholder="0" />
+            <span class="unit-label">นาที</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ===== SECTION 6.4: SEDENTARY ===== -->
+    <div class="card">
+      <div class="card-header purple">6.4 พฤติกรรมเนือยนิ่ง / เคลื่อนไหวน้อย</div>
+      <div class="card-body">
+        <div class="section-note">
+          คำถามต่อไปนี้เป็นคำถามเกี่ยวกับ<strong>พฤติกรรมนั่งหรือเอนกาย</strong> ทั้งที่บ้าน ที่ทำงาน หรือสถานที่อื่นๆ เช่น นั่งคุยกับเพื่อน นั่งในรถ ดูโทรทัศน์ ใช้คอมพิวเตอร์ เป็นต้น<br/>
+          <strong>ไม่รวม</strong>การนอนหลับพักผ่อน
+        </div>
+
+        <!-- Q16: Sedentary time -->
+        <div class="question-block" id="block_s16">
+          <div class="question-label">
+            <span class="q-num">16</span>
+            โดยปกติใน 1 วัน ท่านนั่งหรือเอนกาย (ไม่นับการนอนหลับ) รวมนานเท่าไร
+          </div>
+          <div class="time-input-row">
+            <input type="number" name="s16_hours" min="0" max="23" placeholder="0" />
+            <span class="unit-label">ชั่วโมง</span>
+            <input type="number" name="s16_mins" min="0" max="59" placeholder="0" />
+            <span class="unit-label">นาที</span>
+          </div>
+        </div>
+
+        <hr class="divider" />
+
+        <!-- Q17: Bedtime -->
+        <div class="question-block" id="block_s17">
+          <div class="question-label">
+            <span class="q-num">17</span>
+            โดยปกติท่านเข้านอนเวลาใด
+          </div>
+          <input type="time" name="s17_bedtime" />
+        </div>
+
+        <hr class="divider" />
+
+        <!-- Q18: Wake-up time -->
+        <div class="question-block" id="block_s18">
+          <div class="question-label">
+            <span class="q-num">18</span>
+            โดยปกติท่านตื่นนอนเวลาใด
+          </div>
+          <input type="time" name="s18_waketime" />
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Submit -->
+    <div class="submit-area">
+      <button type="submit">ส่งแบบสอบถาม</button>
+    </div>
+
+  </form>
+
+  <!-- Thank you screen -->
+  <div id="thank-you">
+    <div class="icon">✅</div>
+    <h2>ขอบคุณที่ตอบแบบสอบถาม</h2>
+    <p>ข้อมูลของท่านถูกบันทึกเรียบร้อยแล้ว</p>
+  </div>
+
+</main>
+
+<script>
+  // ──────────────────────────────────────────────
+  // SKIP LOGIC
+  // ──────────────────────────────────────────────
+
+  function showBlock(id) {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('hidden');
+  }
+  function hideBlock(id) {
+    const el = document.getElementById(id);
+    if (el) el.classList.add('hidden');
+  }
+
+  // W1: heavy work → show/hide W2, W3
+  document.querySelectorAll('input[name="w1"]').forEach(function(radio) {
+    radio.addEventListener('change', function() {
+      if (this.value === '1') {
+        showBlock('block_w2');
+        showBlock('block_w3');
+      } else {
+        hideBlock('block_w2');
+        hideBlock('block_w3');
+        document.querySelector('input[name="w2_days"]').value = '';
+        document.querySelector('input[name="w3_hours"]').value = '';
+        document.querySelector('input[name="w3_mins"]').value = '';
+      }
+      updateProgress();
+    });
+  });
+
+  // W4: moderate work → show/hide W5, W6
+  document.querySelectorAll('input[name="w4"]').forEach(function(radio) {
+    radio.addEventListener('change', function() {
+      if (this.value === '1') {
+        showBlock('block_w5');
+        showBlock('block_w6');
+      } else {
+        hideBlock('block_w5');
+        hideBlock('block_w6');
+        document.querySelector('input[name="w5_days"]').value = '';
+        document.querySelector('input[name="w6_hours"]').value = '';
+        document.querySelector('input[name="w6_mins"]').value = '';
+      }
+      updateProgress();
+    });
+  });
+
+  // T7: walk/cycle transport → show/hide T8, T9
+  document.querySelectorAll('input[name="t7"]').forEach(function(radio) {
+    radio.addEventListener('change', function() {
+      if (this.value === '1') {
+        showBlock('block_t8');
+        showBlock('block_t9');
+      } else {
+        hideBlock('block_t8');
+        hideBlock('block_t9');
+        document.querySelector('input[name="t8_days"]').value = '';
+        document.querySelector('input[name="t9_hours"]').value = '';
+        document.querySelector('input[name="t9_mins"]').value = '';
+      }
+      updateProgress();
+    });
+  });
+
+  // R10: vigorous recreation → show/hide R11, R12
+  document.querySelectorAll('input[name="r10"]').forEach(function(radio) {
+    radio.addEventListener('change', function() {
+      if (this.value === '1') {
+        showBlock('block_r11');
+        showBlock('block_r12');
+      } else {
+        hideBlock('block_r11');
+        hideBlock('block_r12');
+        document.querySelector('input[name="r11_days"]').value = '';
+        document.querySelector('input[name="r12_hours"]').value = '';
+        document.querySelector('input[name="r12_mins"]').value = '';
+      }
+      updateProgress();
+    });
+  });
+
+  // R13: moderate recreation → show/hide R14, R15
+  document.querySelectorAll('input[name="r13"]').forEach(function(radio) {
+    radio.addEventListener('change', function() {
+      if (this.value === '1') {
+        showBlock('block_r14');
+        showBlock('block_r15');
+      } else {
+        hideBlock('block_r14');
+        hideBlock('block_r15');
+        document.querySelector('input[name="r14_days"]').value = '';
+        document.querySelector('input[name="r15_hours"]').value = '';
+        document.querySelector('input[name="r15_mins"]').value = '';
+      }
+      updateProgress();
+    });
+  });
+
+  // ──────────────────────────────────────────────
+  // HIGHLIGHT SELECTED RADIO
+  // ──────────────────────────────────────────────
+  document.querySelectorAll('.radio-option input[type="radio"]').forEach(function(radio) {
+    radio.addEventListener('change', function() {
+      // Remove selected from all options in this group
+      document.querySelectorAll('input[name="' + this.name + '"]').forEach(function(r) {
+        r.closest('.radio-option').classList.remove('selected');
+      });
+      // Add selected to this one
+      this.closest('.radio-option').classList.add('selected');
+      updateProgress();
+    });
+  });
+
+  // ──────────────────────────────────────────────
+  // PROGRESS BAR
+  // ──────────────────────────────────────────────
+  function updateProgress() {
+    // Count visible question blocks
+    var allBlocks = document.querySelectorAll('.question-block:not(.hidden)');
+    var answered = 0;
+    allBlocks.forEach(function(block) {
+      // Check if there's an input with a value or a radio checked
+      var hasRadio = block.querySelector('input[type="radio"]:checked');
+      var hasNumber = Array.from(block.querySelectorAll('input[type="number"]')).some(function(i) {
+        return i.value !== '';
+      });
+      var hasTime = Array.from(block.querySelectorAll('input[type="time"]')).some(function(i) {
+        return i.value !== '';
+      });
+      if (hasRadio || hasNumber || hasTime) answered++;
+    });
+    var pct = allBlocks.length > 0 ? Math.round((answered / allBlocks.length) * 100) : 0;
+    document.getElementById('progressBar').style.width = pct + '%';
+  }
+
+  // Also fire progress on number/time input changes
+  document.querySelectorAll('input[type="number"], input[type="time"]').forEach(function(inp) {
+    inp.addEventListener('input', updateProgress);
+  });
+
+  // ──────────────────────────────────────────────
+  // FORM SUBMIT
+  // ──────────────────────────────────────────────
+  document.getElementById('gpaqForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    // Basic validation: gender and marital required
+    if (!document.querySelector('input[name="gender"]:checked')) {
+      alert('กรุณาเลือกเพศ');
+      return;
+    }
+    if (!document.querySelector('input[name="marital"]:checked')) {
+      alert('กรุณาเลือกสถานภาพสมรส');
+      return;
+    }
+    if (!document.querySelector('input[name="w1"]:checked')) {
+      alert('กรุณาตอบข้อ 1 ในส่วนกิจกรรมการทำงาน');
+      return;
+    }
+    if (!document.querySelector('input[name="t7"]:checked')) {
+      alert('กรุณาตอบข้อ 7 ในส่วนกิจกรรมการเดินทาง');
+      return;
+    }
+    if (!document.querySelector('input[name="r10"]:checked')) {
+      alert('กรุณาตอบข้อ 10 ในส่วนกิจกรรมนันทนาการ');
+      return;
+    }
+    if (!document.querySelector('input[name="r13"]:checked')) {
+      alert('กรุณาตอบข้อ 13 ในส่วนกิจกรรมนันทนาการระดับปานกลาง');
+      return;
+    }
+
+    // Show thank-you screen
+    document.getElementById('gpaqForm').style.display = 'none';
+    document.getElementById('thank-you').style.display = 'block';
+    document.getElementById('progressBar').style.width = '100%';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+</script>
+
+</body>
+</html>
