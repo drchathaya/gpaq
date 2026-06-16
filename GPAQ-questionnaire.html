@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>แบบสอบถามกิจกรรมทางกาย (GPAQ)</title>
+  <title>แบบสอบถามสุขภาพ GPAQ + 2Q/9Q</title>
   <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet" />
+
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -62,6 +63,58 @@
     .card-header.teal   { background: #00695c; }
     .card-header.amber  { background: #e65100; }
     .card-header.purple { background: #4a148c; }
+    .card-header.rose   { background: #880e4f; }
+    .card-header.indigo { background: #283593; }
+
+    /* 9Q Likert table */
+    .likert-table { width: 100%; border-collapse: collapse; margin-top: 4px; }
+    .likert-table th {
+      background: #f0f0f0;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 8px 6px;
+      text-align: center;
+      border: 1px solid #ddd;
+    }
+    .likert-table th.q-col { text-align: left; width: 55%; }
+    .likert-table td {
+      padding: 10px 6px;
+      border: 1px solid #eee;
+      text-align: center;
+      font-size: 14px;
+    }
+    .likert-table td.q-text { text-align: left; font-size: 15px; padding-left: 10px; }
+    .likert-table tr:nth-child(even) { background: #fafafa; }
+    .likert-table tr:hover { background: #f0f4ff; }
+    .likert-table input[type="radio"] { accent-color: #283593; width: 18px; height: 18px; }
+
+    /* Score result box */
+    .score-box {
+      display: none;
+      margin-top: 20px;
+      padding: 16px 20px;
+      border-radius: 8px;
+      font-size: 15px;
+      line-height: 1.8;
+    }
+    .score-box.green  { background: #e8f5e9; border-left: 4px solid #2e7d32; }
+    .score-box.yellow { background: #fffde7; border-left: 4px solid #f9a825; }
+    .score-box.orange { background: #fff3e0; border-left: 4px solid #e65100; }
+    .score-box.red    { background: #ffebee; border-left: 4px solid #c62828; }
+
+    /* 2Q result notice */
+    .notice-box {
+      margin-top: 14px;
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      background: #e8f5e9;
+      border-left: 4px solid #2e7d32;
+    }
+    .notice-box.warn {
+      background: #fff8e1;
+      border-left-color: #f9a825;
+    }
 
     .card-body { padding: 20px; }
 
@@ -69,7 +122,8 @@
       margin-bottom: 22px;
       transition: opacity 0.3s, max-height 0.4s;
     }
-    .question-block.hidden {
+    .question-block.hidden,
+    .card.hidden {
       display: none;
     }
 
@@ -204,15 +258,87 @@
       line-height: 1.8;
     }
 
-    /* Thank you screen */
-    #thank-you {
-      display: none;
+    /* Results page */
+    #results-page { display: none; }
+
+    .results-header {
+      background: #1a3a6b;
+      color: #fff;
+      border-radius: 10px;
+      padding: 24px 20px;
       text-align: center;
-      padding: 60px 20px;
+      margin-bottom: 24px;
     }
-    #thank-you .icon { font-size: 56px; }
-    #thank-you h2 { font-size: 24px; margin: 16px 0 8px; color: #2e7d32; }
-    #thank-you p { color: #555; }
+    .results-header h2 { font-size: 20px; font-weight: 700; }
+    .results-header p  { font-size: 14px; opacity: 0.8; margin-top: 4px; }
+
+    .result-card {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+    .result-card-header {
+      padding: 12px 18px;
+      font-weight: 700;
+      font-size: 15px;
+      color: #fff;
+    }
+    .result-card-header.blue   { background: #1a3a6b; }
+    .result-card-header.green  { background: #2e7d32; }
+    .result-card-header.teal   { background: #00695c; }
+    .result-card-header.rose   { background: #880e4f; }
+    .result-card-body { padding: 18px 20px; }
+
+    .result-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 8px 0;
+      border-bottom: 1px solid #f0f0f0;
+      font-size: 15px;
+      gap: 12px;
+    }
+    .result-row:last-child { border-bottom: none; }
+    .result-row .label { color: #555; }
+    .result-row .value { font-weight: 600; text-align: right; }
+
+    .verdict-box {
+      margin-top: 14px;
+      padding: 14px 16px;
+      border-radius: 8px;
+      font-size: 15px;
+      line-height: 1.8;
+    }
+    .verdict-box.green  { background: #e8f5e9; border-left: 4px solid #2e7d32; }
+    .verdict-box.yellow { background: #fffde7; border-left: 4px solid #f9a825; }
+    .verdict-box.orange { background: #fff3e0; border-left: 4px solid #e65100; }
+    .verdict-box.red    { background: #ffebee; border-left: 4px solid #c62828; }
+    .verdict-box.blue   { background: #e3f2fd; border-left: 4px solid #1565c0; }
+    .verdict-box .verdict-title { font-weight: 700; font-size: 16px; margin-bottom: 6px; }
+    .tip-list { margin-top: 10px; padding-left: 18px; }
+    .tip-list li { margin-bottom: 6px; font-size: 14px; color: #333; }
+
+    .print-area { text-align: center; margin: 10px 0 30px; }
+    .print-btn {
+      background: #fff;
+      color: #1a3a6b;
+      border: 2px solid #1a3a6b;
+      padding: 12px 32px;
+      border-radius: 8px;
+      font-family: 'Sarabun', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .print-btn:hover { background: #e8eef8; }
+
+    @media print {
+      header, .progress-bar-wrap, #gpaqForm, .print-area { display: none !important; }
+      #results-page { display: block !important; }
+      .result-card { box-shadow: none; border: 1px solid #ddd; }
+    }
 
     @media (max-width: 480px) {
       header h1 { font-size: 19px; }
@@ -227,8 +353,8 @@
 <body>
 
 <header>
-  <h1>แบบสอบถามกิจกรรมทางกาย (GPAQ)</h1>
-  <p>Global Physical Activity Questionnaire — ฉบับภาษาไทย</p>
+  <h1>แบบสอบถามสุขภาพผู้ปฏิบัติงาน</h1>
+  <p>กิจกรรมทางกาย (GPAQ) + คัดกรองโรคซึมเศร้า (2Q/9Q)</p>
 </header>
 <div class="progress-bar-wrap">
   <div class="progress-bar" id="progressBar"></div>
@@ -614,6 +740,156 @@
       </div>
     </div>
 
+    <!-- ===== SECTION 2Q ===== -->
+    <div class="card">
+      <div class="card-header rose">แบบคัดกรองโรคซึมเศร้า 2 คำถาม (2Q)</div>
+      <div class="card-body">
+        <div class="section-note">
+          คำถามต่อไปนี้ถามเกี่ยวกับ<strong>ความรู้สึกของท่านใน 2 สัปดาห์ที่ผ่านมา รวมวันนี้</strong><br/>
+          กรุณาตอบตามความเป็นจริง ข้อมูลทั้งหมดเป็นความลับ
+        </div>
+
+        <!-- 2Q-1 -->
+        <div class="question-block">
+          <div class="question-label">
+            <span class="q-num" style="background:#880e4f">1</span>
+            ใน 2 สัปดาห์ที่ผ่านมา รวมวันนี้ ท่านรู้สึก<strong>หดหู่ เศร้า หรือท้อแท้สิ้นหวัง</strong> หรือไม่
+          </div>
+          <div class="radio-group">
+            <label class="radio-option">
+              <input type="radio" name="q2_1" value="1" />
+              มี
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="q2_1" value="0" />
+              ไม่มี
+            </label>
+          </div>
+        </div>
+
+        <hr class="divider" />
+
+        <!-- 2Q-2 -->
+        <div class="question-block">
+          <div class="question-label">
+            <span class="q-num" style="background:#880e4f">2</span>
+            ใน 2 สัปดาห์ที่ผ่านมา รวมวันนี้ ท่านรู้สึก<strong>เบื่อ ทำอะไรก็ไม่เพลิดเพลิน</strong> หรือไม่
+          </div>
+          <div class="radio-group">
+            <label class="radio-option">
+              <input type="radio" name="q2_2" value="1" />
+              มี
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="q2_2" value="0" />
+              ไม่มี
+            </label>
+          </div>
+        </div>
+
+        <!-- 2Q result notice -->
+        <div class="notice-box" id="notice2q" style="display:none"></div>
+
+      </div>
+    </div>
+
+    <!-- ===== SECTION 9Q (shown only if 2Q positive) ===== -->
+    <div class="card hidden" id="card9q">
+      <div class="card-header indigo">แบบประเมินโรคซึมเศร้า 9 คำถาม (9Q)</div>
+      <div class="card-body">
+        <div class="section-note">
+          ในช่วง <strong>2 สัปดาห์ที่ผ่านมา รวมทั้งวันนี้</strong> ท่านมีอาการเหล่านี้บ่อยแค่ไหน<br/>
+          กรุณาเลือกคำตอบที่ตรงกับความรู้สึกของท่านมากที่สุด
+        </div>
+
+        <div style="overflow-x:auto">
+        <table class="likert-table">
+          <thead>
+            <tr>
+              <th class="q-col">อาการ</th>
+              <th>ไม่มีเลย<br/><small>(0)</small></th>
+              <th>เป็นบางวัน<br/><small>1–7 วัน (1)</small></th>
+              <th>เป็นบ่อย<br/><small>&gt;7 วัน (2)</small></th>
+              <th>เป็นทุกวัน<br/><small>(3)</small></th>
+            </tr>
+          </thead>
+          <tbody id="q9tbody">
+            <tr>
+              <td class="q-text">1. เบื่อ ไม่สนใจอยากทำอะไร</td>
+              <td><input type="radio" name="q9_1" value="0" /></td>
+              <td><input type="radio" name="q9_1" value="1" /></td>
+              <td><input type="radio" name="q9_1" value="2" /></td>
+              <td><input type="radio" name="q9_1" value="3" /></td>
+            </tr>
+            <tr>
+              <td class="q-text">2. ไม่สบายใจ ซึมเศร้า ท้อแท้</td>
+              <td><input type="radio" name="q9_2" value="0" /></td>
+              <td><input type="radio" name="q9_2" value="1" /></td>
+              <td><input type="radio" name="q9_2" value="2" /></td>
+              <td><input type="radio" name="q9_2" value="3" /></td>
+            </tr>
+            <tr>
+              <td class="q-text">3. หลับยาก หรือหลับๆ ตื่นๆ หรือหลับมากไป</td>
+              <td><input type="radio" name="q9_3" value="0" /></td>
+              <td><input type="radio" name="q9_3" value="1" /></td>
+              <td><input type="radio" name="q9_3" value="2" /></td>
+              <td><input type="radio" name="q9_3" value="3" /></td>
+            </tr>
+            <tr>
+              <td class="q-text">4. เหนื่อยง่าย หรือไม่ค่อยมีแรง</td>
+              <td><input type="radio" name="q9_4" value="0" /></td>
+              <td><input type="radio" name="q9_4" value="1" /></td>
+              <td><input type="radio" name="q9_4" value="2" /></td>
+              <td><input type="radio" name="q9_4" value="3" /></td>
+            </tr>
+            <tr>
+              <td class="q-text">5. เบื่ออาหาร หรือกินมากเกินไป</td>
+              <td><input type="radio" name="q9_5" value="0" /></td>
+              <td><input type="radio" name="q9_5" value="1" /></td>
+              <td><input type="radio" name="q9_5" value="2" /></td>
+              <td><input type="radio" name="q9_5" value="3" /></td>
+            </tr>
+            <tr>
+              <td class="q-text">6. รู้สึกไม่ดีกับตัวเอง คิดว่าตัวเองล้มเหลว หรือครอบครัวผิดหวัง</td>
+              <td><input type="radio" name="q9_6" value="0" /></td>
+              <td><input type="radio" name="q9_6" value="1" /></td>
+              <td><input type="radio" name="q9_6" value="2" /></td>
+              <td><input type="radio" name="q9_6" value="3" /></td>
+            </tr>
+            <tr>
+              <td class="q-text">7. สมาธิไม่ดี เวลาดูโทรทัศน์ ฟังวิทยุ หรือทำงานที่ต้องใช้ความตั้งใจ</td>
+              <td><input type="radio" name="q9_7" value="0" /></td>
+              <td><input type="radio" name="q9_7" value="1" /></td>
+              <td><input type="radio" name="q9_7" value="2" /></td>
+              <td><input type="radio" name="q9_7" value="3" /></td>
+            </tr>
+            <tr>
+              <td class="q-text">8. พูดช้า ทำอะไรช้าลงจนคนอื่นสังเกตเห็นได้ หรือกระสับกระส่ายอยู่ไม่นิ่ง</td>
+              <td><input type="radio" name="q9_8" value="0" /></td>
+              <td><input type="radio" name="q9_8" value="1" /></td>
+              <td><input type="radio" name="q9_8" value="2" /></td>
+              <td><input type="radio" name="q9_8" value="3" /></td>
+            </tr>
+            <tr>
+              <td class="q-text">9. คิดทำร้ายตนเอง หรือคิดว่าถ้าตายไปคงจะดี</td>
+              <td><input type="radio" name="q9_9" value="0" /></td>
+              <td><input type="radio" name="q9_9" value="1" /></td>
+              <td><input type="radio" name="q9_9" value="2" /></td>
+              <td><input type="radio" name="q9_9" value="3" /></td>
+            </tr>
+          </tbody>
+        </table>
+        </div>
+
+        <!-- 9Q auto score result -->
+        <div class="score-box green"  id="score9q_1">คะแนนรวม: <strong id="score9q_val"></strong> คะแนน — ไม่มีอาการของโรคซึมเศร้า หรือมีอาการน้อยมาก</div>
+        <div class="score-box yellow" id="score9q_2">คะแนนรวม: <strong id="score9q_val2"></strong> คะแนน — มีอาการของโรคซึมเศร้า <strong>ระดับน้อย</strong></div>
+        <div class="score-box orange" id="score9q_3">คะแนนรวม: <strong id="score9q_val3"></strong> คะแนน — มีอาการของโรคซึมเศร้า <strong>ระดับปานกลาง</strong></div>
+        <div class="score-box red"    id="score9q_4">คะแนนรวม: <strong id="score9q_val4"></strong> คะแนน — มีอาการของโรคซึมเศร้า <strong>ระดับรุนแรง</strong> — ควรพบแพทย์</div>
+
+      </div>
+    </div>
+
     <!-- Submit -->
     <div class="submit-area">
       <button type="submit">ส่งแบบสอบถาม</button>
@@ -621,11 +897,65 @@
 
   </form>
 
-  <!-- Thank you screen -->
-  <div id="thank-you">
-    <div class="icon">✅</div>
-    <h2>ขอบคุณที่ตอบแบบสอบถาม</h2>
-    <p>ข้อมูลของท่านถูกบันทึกเรียบร้อยแล้ว</p>
+  <!-- Results page -->
+  <div id="results-page">
+    <div class="results-header">
+      <h2>✅ ผลการประเมินสุขภาพของท่าน</h2>
+      <p id="res-date"></p>
+    </div>
+
+    <!-- Personal info -->
+    <div class="result-card">
+      <div class="result-card-header blue">ข้อมูลส่วนตัว</div>
+      <div class="result-card-body">
+        <div class="result-row"><span class="label">เพศ</span><span class="value" id="res-gender">—</span></div>
+        <div class="result-row"><span class="label">อายุ</span><span class="value" id="res-age">—</span></div>
+        <div class="result-row"><span class="label">สถานภาพสมรส</span><span class="value" id="res-marital">—</span></div>
+      </div>
+    </div>
+
+    <!-- GPAQ physical activity -->
+    <div class="result-card">
+      <div class="result-card-header green">กิจกรรมทางกาย (GPAQ)</div>
+      <div class="result-card-body">
+        <div class="result-row"><span class="label">กิจกรรมการทำงาน (หนัก)</span><span class="value" id="res-w-vig">—</span></div>
+        <div class="result-row"><span class="label">กิจกรรมการทำงาน (ปานกลาง)</span><span class="value" id="res-w-mod">—</span></div>
+        <div class="result-row"><span class="label">การเดินทาง (เดิน/ปั่นจักรยาน)</span><span class="value" id="res-t">—</span></div>
+        <div class="result-row"><span class="label">นันทนาการ (หนัก)</span><span class="value" id="res-r-vig">—</span></div>
+        <div class="result-row"><span class="label">นันทนาการ (ปานกลาง)</span><span class="value" id="res-r-mod">—</span></div>
+        <div class="result-row" style="background:#f5f5f5;border-radius:6px;padding:10px 8px;margin-top:8px">
+          <span class="label"><strong>คะแนนกิจกรรมทางกายรวม (MET-นาที/สัปดาห์)</strong></span>
+          <span class="value" id="res-met" style="font-size:18px;color:#1a3a6b">—</span>
+        </div>
+        <div class="verdict-box" id="res-gpaq-verdict"></div>
+      </div>
+    </div>
+
+    <!-- Sedentary & sleep -->
+    <div class="result-card">
+      <div class="result-card-header teal">พฤติกรรมเนือยนิ่งและการนอนหลับ</div>
+      <div class="result-card-body">
+        <div class="result-row"><span class="label">เวลานั่ง/เอนกายต่อวัน</span><span class="value" id="res-sit">—</span></div>
+        <div class="result-row"><span class="label">เวลาเข้านอน</span><span class="value" id="res-bed">—</span></div>
+        <div class="result-row"><span class="label">เวลาตื่นนอน</span><span class="value" id="res-wake">—</span></div>
+        <div class="result-row"><span class="label">ระยะเวลานอนหลับโดยประมาณ</span><span class="value" id="res-sleep">—</span></div>
+        <div class="verdict-box" id="res-sleep-verdict"></div>
+      </div>
+    </div>
+
+    <!-- Depression screening -->
+    <div class="result-card">
+      <div class="result-card-header rose">การคัดกรองโรคซึมเศร้า (2Q/9Q)</div>
+      <div class="result-card-body">
+        <div class="result-row"><span class="label">ผล 2Q</span><span class="value" id="res-2q">—</span></div>
+        <div class="result-row" id="res-9q-row" style="display:none"><span class="label">คะแนน 9Q</span><span class="value" id="res-9q">—</span></div>
+        <div class="verdict-box" id="res-depress-verdict"></div>
+      </div>
+    </div>
+
+    <div class="print-area">
+      <button class="print-btn" onclick="window.print()">🖨️ พิมพ์ผลลัพธ์</button>
+    </div>
   </div>
 
 </main>
@@ -772,6 +1102,78 @@
   });
 
   // ──────────────────────────────────────────────
+  // 2Q SKIP LOGIC → SHOW 9Q
+  // ──────────────────────────────────────────────
+
+  function check2Q() {
+    var a1 = document.querySelector('input[name="q2_1"]:checked');
+    var a2 = document.querySelector('input[name="q2_2"]:checked');
+    if (!a1 || !a2) return; // not both answered yet
+
+    var positive = (a1.value === '1' || a2.value === '1');
+    var notice   = document.getElementById('notice2q');
+    var card9q   = document.getElementById('card9q');
+
+    notice.style.display = 'block';
+    if (positive) {
+      notice.className = 'notice-box warn';
+      notice.innerHTML = '⚠️ ท่านมีความเสี่ยงต่อโรคซึมเศร้า กรุณาตอบแบบประเมิน 9Q ด้านล่างต่อ';
+      card9q.classList.remove('hidden');
+      card9q.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else {
+      notice.className = 'notice-box';
+      notice.innerHTML = '✅ ผลการคัดกรอง 2Q: ปกติ ไม่พบความเสี่ยงของโรคซึมเศร้า';
+      card9q.classList.add('hidden');
+    }
+    updateProgress();
+  }
+
+  document.querySelectorAll('input[name="q2_1"], input[name="q2_2"]').forEach(function(r) {
+    r.addEventListener('change', function() {
+      this.closest('.radio-option') && null; // highlight handled below
+      check2Q();
+    });
+  });
+
+  // ──────────────────────────────────────────────
+  // 9Q AUTO SCORE
+  // ──────────────────────────────────────────────
+
+  function calc9Q() {
+    var total = 0;
+    var allAnswered = true;
+    for (var i = 1; i <= 9; i++) {
+      var checked = document.querySelector('input[name="q9_' + i + '"]:checked');
+      if (checked) {
+        total += parseInt(checked.value);
+      } else {
+        allAnswered = false;
+      }
+    }
+    if (!allAnswered) return;
+
+    // Hide all score boxes
+    ['score9q_1','score9q_2','score9q_3','score9q_4'].forEach(function(id) {
+      document.getElementById(id).style.display = 'none';
+    });
+
+    var box, valId;
+    if (total < 7)       { box = 'score9q_1'; valId = 'score9q_val'; }
+    else if (total <= 12) { box = 'score9q_2'; valId = 'score9q_val2'; }
+    else if (total <= 18) { box = 'score9q_3'; valId = 'score9q_val3'; }
+    else                  { box = 'score9q_4'; valId = 'score9q_val4'; }
+
+    document.getElementById(valId).textContent = total;
+    var el = document.getElementById(box);
+    el.style.display = 'block';
+    updateProgress();
+  }
+
+  document.querySelectorAll('input[name^="q9_"]').forEach(function(r) {
+    r.addEventListener('change', calc9Q);
+  });
+
+  // ──────────────────────────────────────────────
   // FORM SUBMIT
   // ──────────────────────────────────────────────
   document.getElementById('gpaqForm').addEventListener('submit', function(e) {
@@ -802,10 +1204,212 @@
       alert('กรุณาตอบข้อ 13 ในส่วนกิจกรรมนันทนาการระดับปานกลาง');
       return;
     }
+    if (!document.querySelector('input[name="q2_1"]:checked') ||
+        !document.querySelector('input[name="q2_2"]:checked')) {
+      alert('กรุณาตอบแบบคัดกรองโรคซึมเศร้า 2Q ให้ครบทั้ง 2 ข้อ');
+      return;
+    }
+    // If 9Q is visible, require all 9 answers
+    var card9q = document.getElementById('card9q');
+    if (!card9q.classList.contains('hidden')) {
+      for (var i = 1; i <= 9; i++) {
+        if (!document.querySelector('input[name="q9_' + i + '"]:checked')) {
+          alert('กรุณาตอบแบบประเมิน 9Q ให้ครบทุกข้อ');
+          return;
+        }
+      }
+    }
 
-    // Show thank-you screen
+    // ── Collect & calculate ──
+
+    // Personal info
+    var gender  = document.querySelector('input[name="gender"]:checked').value;
+    var age     = document.querySelector('input[name="age"]').value || '—';
+    var marital = document.querySelector('input[name="marital"]:checked').value;
+
+    // Helper: get number input value or 0
+    function n(name) { var el = document.querySelector('input[name="' + name + '"]'); return el ? (parseFloat(el.value) || 0) : 0; }
+    function radio(name) { var el = document.querySelector('input[name="' + name + '"]:checked'); return el ? el.value : '2'; }
+
+    // ── GPAQ MET calculation (WHO GPAQ Analysis Guide formula) ──
+    // Formula: Total MET-min/week = (P2×P3×8) + (P5×P6×4) + (P8×P9×4) + (P11×P12×8) + (P14×P15×4)
+    // where P3,P6,P9,P12,P15 = time in minutes/day; vigorous MET=8, moderate/transport MET=4
+    // Implausible value rule: if time > 960 min (16 hrs) per sub-domain → treat as invalid (0)
+
+    function subdomainMins(hoursName, minsName) {
+      var total = n(hoursName) * 60 + n(minsName);
+      return total > 960 ? 0 : total; // >16 hrs/day = implausible per WHO cleaning guide
+    }
+    function daysVal(daysName) {
+      var d = n(daysName);
+      return (d >= 1 && d <= 7) ? d : 0; // >7 days/week = implausible
+    }
+
+    var wVigMET = 0, wModMET = 0, tMET = 0, rVigMET = 0, rModMET = 0;
+    var wVigMin = 0, wModMin = 0, tMin = 0, rVigMin = 0, rModMin = 0;
+
+    if (radio('w1') === '1') {
+      var d = daysVal('w2_days'), m = subdomainMins('w3_hours', 'w3_mins');
+      wVigMin = d * m;
+      wVigMET = 8 * wVigMin;
+    }
+    if (radio('w4') === '1') {
+      var d = daysVal('w5_days'), m = subdomainMins('w6_hours', 'w6_mins');
+      wModMin = d * m;
+      wModMET = 4 * wModMin;
+    }
+    if (radio('t7') === '1') {
+      var d = daysVal('t8_days'), m = subdomainMins('t9_hours', 't9_mins');
+      tMin = d * m;
+      tMET = 4 * tMin;
+    }
+    if (radio('r10') === '1') {
+      var d = daysVal('r11_days'), m = subdomainMins('r12_hours', 'r12_mins');
+      rVigMin = d * m;
+      rVigMET = 8 * rVigMin;
+    }
+    if (radio('r13') === '1') {
+      var d = daysVal('r14_days'), m = subdomainMins('r15_hours', 'r15_mins');
+      rModMin = d * m;
+      rModMET = 4 * rModMin;
+    }
+    var totalMET = wVigMET + wModMET + tMET + rVigMET + rModMET;
+
+    // Total vigorous minutes/week and moderate minutes/week (for display)
+    var totalVigMin = wVigMin + rVigMin;
+    var totalModMin = wModMin + tMin + rModMin;
+
+    function metLabel(met, minVal) {
+      if (met === 0) return 'ไม่มี';
+      return met.toLocaleString() + ' MET-นาที/สัปดาห์ (' + minVal.toLocaleString() + ' นาที/สัปดาห์)';
+    }
+
+    // Sedentary & sleep
+    var sitH = n('s16_hours'), sitM = n('s16_mins');
+    var sitTotal = sitH + sitM / 60;
+
+    var bedtime  = document.querySelector('input[name="s17_bedtime"]').value;
+    var waketime = document.querySelector('input[name="s18_waketime"]').value;
+    var sleepDurText = '—';
+    if (bedtime && waketime) {
+      var bParts = bedtime.split(':').map(Number);
+      var wParts = waketime.split(':').map(Number);
+      var bMins = bParts[0] * 60 + bParts[1];
+      var wMins = wParts[0] * 60 + wParts[1];
+      if (wMins < bMins) wMins += 24 * 60; // crosses midnight
+      var dur = wMins - bMins;
+      sleepDurText = Math.floor(dur / 60) + ' ชั่วโมง ' + (dur % 60) + ' นาที';
+    }
+
+    // 2Q / 9Q
+    var q2a1 = radio('q2_1');
+    var q2a2 = radio('q2_2');
+    var twoQPositive = (q2a1 === '1' || q2a2 === '1');
+    var nineQScore = 0;
+    if (twoQPositive) {
+      for (var qi = 1; qi <= 9; qi++) {
+        var qEl = document.querySelector('input[name="q9_' + qi + '"]:checked');
+        if (qEl) nineQScore += parseInt(qEl.value);
+      }
+    }
+
+    // ── Render results ──
+    document.getElementById('res-date').textContent =
+      'วันที่ประเมิน: ' + new Date().toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' });
+
+    document.getElementById('res-gender').textContent  = gender;
+    document.getElementById('res-age').textContent     = age + ' ปี';
+    document.getElementById('res-marital').textContent = marital;
+
+    document.getElementById('res-w-vig').textContent = radio('w1') === '1' ? metLabel(wVigMET, wVigMin) : 'ไม่มี';
+    document.getElementById('res-w-mod').textContent = radio('w4') === '1' ? metLabel(wModMET, wModMin) : 'ไม่มี';
+    document.getElementById('res-t').textContent     = radio('t7') === '1' ? metLabel(tMET, tMin)       : 'ไม่มี';
+    document.getElementById('res-r-vig').textContent = radio('r10') === '1' ? metLabel(rVigMET, rVigMin) : 'ไม่มี';
+    document.getElementById('res-r-mod').textContent = radio('r13') === '1' ? metLabel(rModMET, rModMin) : 'ไม่มี';
+    document.getElementById('res-met').textContent   = totalMET.toLocaleString() + ' MET-นาที/สัปดาห์';
+
+    // GPAQ verdict — WHO GPAQ Analysis Guide: single cutoff at 600 MET-min/week
+    // "Not meeting recommendations" = < 600; "Meets recommendations" = ≥ 600
+    var gpaqBox = document.getElementById('res-gpaq-verdict');
+    if (totalMET >= 600) {
+      gpaqBox.className = 'verdict-box green';
+      gpaqBox.innerHTML = '<div class="verdict-title">🟢 ผ่านเกณฑ์ — ท่านมีกิจกรรมทางกายเพียงพอตามข้อแนะนำของ WHO</div>' +
+        'คะแนนรวม <strong>' + totalMET.toLocaleString() + ' MET-นาที/สัปดาห์</strong> ซึ่งผ่านเกณฑ์ขั้นต่ำ 600 MET-นาที/สัปดาห์<br/>' +
+        'กิจกรรมระดับหนักรวม: ' + totalVigMin + ' นาที/สัปดาห์ | กิจกรรมระดับปานกลางรวม: ' + totalModMin + ' นาที/สัปดาห์<br/>' +
+        'ขอให้รักษาระดับนี้ต่อไปเพื่อสุขภาพหัวใจ หลอดเลือด และลดความเสี่ยงโรคเรื้อรัง';
+    } else {
+      gpaqBox.className = 'verdict-box orange';
+      gpaqBox.innerHTML = '<div class="verdict-title">🟠 ไม่ผ่านเกณฑ์ — ท่านมีกิจกรรมทางกายน้อยกว่าข้อแนะนำของ WHO</div>' +
+        'คะแนนรวม <strong>' + totalMET.toLocaleString() + ' MET-นาที/สัปดาห์</strong> ซึ่งต่ำกว่าเกณฑ์ขั้นต่ำ 600 MET-นาที/สัปดาห์<br/>' +
+        'WHO แนะนำให้ผู้ใหญ่มีกิจกรรมทางกายอย่างใดอย่างหนึ่งต่อไปนี้ต่อสัปดาห์:' +
+        '<ul class="tip-list">' +
+        '<li>กิจกรรมระดับปานกลาง อย่างน้อย <strong>150 นาที</strong> (เช่น เดินเร็ว ปั่นจักรยาน ว่ายน้ำ)</li>' +
+        '<li>กิจกรรมระดับหนัก อย่างน้อย <strong>75 นาที</strong> (เช่น วิ่ง เล่นกีฬาที่ต้องออกแรงมาก)</li>' +
+        '<li>หรือผสมทั้งสองระดับจนได้ <strong>≥ 600 MET-นาที/สัปดาห์</strong></li>' +
+        '</ul>';
+    }
+
+    // Sedentary & sleep verdict
+    document.getElementById('res-sit').textContent   = sitH + ' ชั่วโมง ' + sitM + ' นาที / วัน';
+    document.getElementById('res-bed').textContent   = bedtime  || '—';
+    document.getElementById('res-wake').textContent  = waketime || '—';
+    document.getElementById('res-sleep').textContent = sleepDurText;
+
+    var sleepBox = document.getElementById('res-sleep-verdict');
+    var sleepMins = 0;
+    if (bedtime && waketime) {
+      var bp = bedtime.split(':').map(Number), wp = waketime.split(':').map(Number);
+      var bm = bp[0] * 60 + bp[1], wm = wp[0] * 60 + wp[1];
+      if (wm < bm) wm += 1440;
+      sleepMins = wm - bm;
+    }
+    var sleepHrs = sleepMins / 60;
+    var sitVerdict = '';
+    if (sitTotal >= 8) {
+      sitVerdict = '<br/>⚠️ <strong>พฤติกรรมเนือยนิ่ง:</strong> ท่านนั่ง/เอนกายมากกว่า 8 ชั่วโมงต่อวัน ซึ่งเป็นความเสี่ยงต่อสุขภาพ แม้ว่าจะออกกำลังกายด้วยก็ตาม ควรลุกขึ้นขยับร่างกายทุก 30–60 นาที';
+    }
+    if (sleepMins === 0) {
+      sleepBox.className = 'verdict-box blue';
+      sleepBox.innerHTML = 'ไม่ได้ระบุเวลานอน' + sitVerdict;
+    } else if (sleepHrs >= 7 && sleepHrs <= 9) {
+      sleepBox.className = 'verdict-box green';
+      sleepBox.innerHTML = '🟢 <strong>การนอนหลับ:</strong> ระยะเวลานอนหลับของท่านอยู่ในเกณฑ์ดี (7–9 ชั่วโมง) ตามคำแนะนำขององค์กรด้านสุขภาพการนอนหลับ' + sitVerdict;
+    } else if (sleepHrs < 7) {
+      sleepBox.className = 'verdict-box orange';
+      sleepBox.innerHTML = '🟠 <strong>การนอนหลับ: น้อยกว่าเกณฑ์</strong> การนอนน้อยกว่า 7 ชั่วโมงอย่างต่อเนื่องเพิ่มความเสี่ยงต่อโรคอ้วน เบาหวาน โรคหัวใจ และส่งผลต่อภูมิคุ้มกัน ควรปรับเวลานอนให้ได้ 7–9 ชั่วโมง' + sitVerdict;
+    } else {
+      sleepBox.className = 'verdict-box yellow';
+      sleepBox.innerHTML = '🟡 <strong>การนอนหลับ: มากกว่าเกณฑ์</strong> การนอนมากกว่า 9 ชั่วโมงบ่อยๆ อาจสัมพันธ์กับปัญหาสุขภาพบางอย่าง เช่น ภาวะซึมเศร้า หรือโรคเรื้อรัง ควรปรึกษาแพทย์หากรู้สึกเหนื่อยล้าแม้นอนมาก' + sitVerdict;
+    }
+
+    // Depression verdict
+    var depressBox = document.getElementById('res-depress-verdict');
+    if (!twoQPositive) {
+      document.getElementById('res-2q').textContent = 'ปกติ (ไม่พบความเสี่ยง)';
+      depressBox.className = 'verdict-box green';
+      depressBox.innerHTML = '🟢 <strong>ผลการคัดกรอง 2Q: ปกติ</strong><br/>ไม่พบความเสี่ยงของโรคซึมเศร้าในขณะนี้ ขอให้รักษาสุขภาพจิตที่ดีต่อไป โดยการพักผ่อนให้เพียงพอ ออกกำลังกาย และพูดคุยกับคนที่ไว้วางใจ';
+    } else {
+      document.getElementById('res-2q').textContent = 'พบความเสี่ยง (ประเมินต่อด้วย 9Q)';
+      document.getElementById('res-9q-row').style.display = 'flex';
+      document.getElementById('res-9q').textContent = nineQScore + ' คะแนน';
+      if (nineQScore < 7) {
+        depressBox.className = 'verdict-box green';
+        depressBox.innerHTML = '🟢 <strong>ผล 9Q: ' + nineQScore + ' คะแนน — ไม่มีอาการของโรคซึมเศร้า หรือมีน้อยมาก</strong><br/>แม้ผล 2Q จะพบความเสี่ยง แต่ผล 9Q ยังอยู่ในเกณฑ์ปกติ หากมีความกังวลหรืออาการเปลี่ยนแปลง ควรปรึกษาผู้เชี่ยวชาญด้านสุขภาพจิต';
+      } else if (nineQScore <= 12) {
+        depressBox.className = 'verdict-box yellow';
+        depressBox.innerHTML = '🟡 <strong>ผล 9Q: ' + nineQScore + ' คะแนน — มีอาการซึมเศร้าระดับน้อย</strong><br/>ท่านอาจมีอาการซึมเศร้าในระดับน้อย ควรดูแลตัวเองโดย:<ul class="tip-list"><li>ออกกำลังกายสม่ำเสมอ แม้เพียงเดินวันละ 30 นาที</li><li>พูดคุยกับคนที่ไว้วางใจหรือเพื่อนสนิท</li><li>หากอาการไม่ดีขึ้นใน 2–4 สัปดาห์ ควรพบแพทย์หรือนักจิตวิทยา</li></ul>';
+      } else if (nineQScore <= 18) {
+        depressBox.className = 'verdict-box orange';
+        depressBox.innerHTML = '🟠 <strong>ผล 9Q: ' + nineQScore + ' คะแนน — มีอาการซึมเศร้าระดับปานกลาง</strong><br/>ท่านมีอาการซึมเศร้าในระดับที่ควรได้รับการดูแล <strong>แนะนำให้พบแพทย์หรือนักจิตวิทยา</strong>เพื่อรับการประเมินและรักษาที่เหมาะสม';
+      } else {
+        depressBox.className = 'verdict-box red';
+        depressBox.innerHTML = '🔴 <strong>ผล 9Q: ' + nineQScore + ' คะแนน — มีอาการซึมเศร้าระดับรุนแรง</strong><br/>ท่านมีอาการซึมเศร้าในระดับรุนแรง <strong>ควรพบแพทย์โดยเร็ว</strong> หากท่านมีความคิดทำร้ายตัวเอง ขอให้โทรสายด่วนสุขภาพจิต <strong>1323</strong> ได้ตลอด 24 ชั่วโมง';
+      }
+    }
+
+    // ── Show results ──
     document.getElementById('gpaqForm').style.display = 'none';
-    document.getElementById('thank-you').style.display = 'block';
+    document.getElementById('results-page').style.display = 'block';
     document.getElementById('progressBar').style.width = '100%';
     window.scrollTo({ top: 0, behavior: 'smooth' });
   });
